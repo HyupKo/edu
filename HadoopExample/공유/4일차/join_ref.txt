@@ -1,0 +1,27 @@
+﻿
+select *
+from symbols a join
+   (select exchange, stock_symbol, count(*)
+    from stock_trade
+    group by exchange, stock_symbol) b
+on a.stock_type = b.exchange and a.stock_symbol = b.stock_symbol;
+
+select b.exchange, a.stock_symbol, a.description, count(*)
+from  symbols  a  left outer join  stock_trade b
+on (b.exchange = a.stock_type and a.stock_symbol = b.stock_symbol)
+where  a.stock_symbol = 'AAIT'
+group by b.exchange, a.stock_symbol, a.description
+
+
+
+
+
+A  col1   B  col1
+
+select *
+from A, B
+where A.col1 = B.col1;
+
+select *
+from A inner join B
+  on A.col1 = B.col1;

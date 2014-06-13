@@ -1,0 +1,89 @@
+// ÀÏ¹Ý JOIN Äõ¸® ***************************************************/
+select a.exchange, a.stock_symbol, b.description, count(*)
+from stock_trade a  join symbols b 
+on (a.exchange = b.stock_type and a.stock_symbol = b.stock_symbol)
+group by a.exchange, a.stock_symbol, b.description
+
+ABSTRACT SYNTAX TREE:
+  (TOK_QUERY 
+    (TOK_FROM 
+      (TOK_JOIN 
+        (TOK_TABREF (TOK_TABNAME stock_trade) a) 
+        (TOK_TABREF (TOK_TABNAME symbols) b) 
+        (and 
+          (= 
+            (. (TOK_TABLE_OR_COL a) exchange) 
+            (. (TOK_TABLE_OR_COL b) stock_type)
+          ) 
+          (= 
+            (. (TOK_TABLE_OR_COL a) stock_symbol) 
+            (. (TOK_TABLE_OR_COL b) stock_symbol)
+          )
+        )
+      )
+    ) 
+    (TOK_INSERT 
+      (TOK_DESTINATION (TOK_DIR TOK_TMP_FILE)) 
+      (TOK_SELECT 
+        (TOK_SELEXPR (. (TOK_TABLE_OR_COL a) exchange)) 
+        (TOK_SELEXPR (. (TOK_TABLE_OR_COL a) stock_symbol)) 
+        (TOK_SELEXPR (. (TOK_TABLE_OR_COL b) description)) 
+        (TOK_SELEXPR (TOK_FUNCTIONSTAR count))
+      ) 
+      (TOK_GROUPBY 
+        (. (TOK_TABLE_OR_COL a) exchange) 
+        (. (TOK_TABLE_OR_COL a) stock_symbol) 
+        (. (TOK_TABLE_OR_COL b) description)
+      )
+    )
+  )
+
+
+
+// MAPJOIN ÈùÆ® »ç¿ë ************************************************/
+select /*+ MAPJOIN(b) */ *
+from (
+  select exchange, stock_symbol, count(*) cnt
+  from stock_trade
+  group by exchange, stock_symbol
+) a join symbols b
+on a.exchange = b.stock_type 
+and a.stock_symbol = b.stock_symbol
+
+ABSTRACT SYNTAX TREE:
+  (TOK_QUERY 
+    (TOK_FROM 
+      (TOK_JOIN 
+        (TOK_SUBQUERY 
+          (TOK_QUERY 
+            (TOK_FROM (TOK_TABREF (TOK_TABNAME stock_trade))) 
+            (TOK_INSERT (TOK_DESTINATION (TOK_DIR TOK_TMP_FILE)) 
+              (TOK_SELECT 
+                (TOK_SELEXPR (TOK_TABLE_OR_COL exchange)) 
+                (TOK_SELEXPR (TOK_TABLE_OR_COL stock_symbol)) 
+                (TOK_SELEXPR (TOK_FUNCTIONSTAR count) cnt)
+              ) 
+              (TOK_GROUPBY 
+                (TOK_TABLE_OR_COL exchange) 
+                (TOK_TABLE_OR_COL stock_symbol)
+              )
+            )
+          ) a
+        ) 
+        (TOK_TABREF (TOK_TABNAME symbols) b) 
+        (and 
+          (= (. (TOK_TABLE_OR_COL a) exchange) (. (TOK_TABLE_OR_COL b) stock_type)) 
+          (= (. (TOK_TABLE_OR_COL a) stock_symbol) (. (TOK_TABLE_OR_COL b) stock_symbol))
+        )
+      )
+    ) 
+    (TOK_INSERT 
+      (TOK_DESTINATION (TOK_DIR TOK_TMP_FILE)) 
+      (TOK_SELECT 
+        (TOK_HINTLIST 
+          (TOK_HINT TOK_MAPJOIN (TOK_HINTARGLIST b))
+        ) 
+        (TOK_SELEXPR TOK_ALLCOLREF)
+      )
+    )
+  )

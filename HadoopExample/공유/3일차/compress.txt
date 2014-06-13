@@ -1,0 +1,10 @@
+conf.setBoolean("mapred.compress.map.output", true);
+conf.set("mapred.map.output.compression.codec",
+	"org.apache.hadoop.io.compress.GzipCodec");
+
+
+job.setOutputFormatClass(SequenceFileOutputFormat.class);
+SequenceFileOutputFormat.setCompressOutput(job, true);
+SequenceFileOutputFormat.setOutputCompressorClass(job, GzipCodec.class);
+SequenceFileOutputFormat.setOutputCompressionType(job, 
+				CompressionType.BLOCK);

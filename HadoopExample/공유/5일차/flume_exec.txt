@@ -1,0 +1,2 @@
+flume/bin/flume-ng agent --conf ./conf/ -f /home/hadoop/flume_netcat.txt -Dflume.root.logger=DEBUG,console -n a1
+flume/bin/flume-ng agent --conf ./conf/ -f /home/hadoop/flume_hdfs.txt -Dflume.root.logger=DEBUG,console -n a1
