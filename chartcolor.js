@@ -57,13 +57,13 @@ $(function($){
 	
 	function calsColors(rgb, slice) {
 		var hsl = rgbToHsl(rgb);
-		var baseHue = hsl[0] * 255;
+		var baseHue = hsl[0] * 240;
 		var step = (255 / slice);
 		var baseRgb = hslToRgb(hsl[0], hsl[1], hsl[2]);
 		colors.push("#" + baseRgb[0].toString(16) + baseRgb[1].toString(16) + baseRgb[2].toString(16));
 		
 		for (var i=0 ; i<slice ; i++) {
-			var tempHue = (baseHue + step * i) % 255;
+			var tempHue = (baseHue + step * i) % 240;
 			var hslArray = hslToRgb(tempHue / 255, hsl[1], hsl[2]);
 			colors.push("#" + hslArray[0].toString(16) + hslArray[1].toString(16) + hslArray[2].toString(16));
 		}
